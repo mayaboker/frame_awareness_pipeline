@@ -1,0 +1,101 @@
+source:
+  uri: 0
+  kind: live  # live or file
+  target_fps: 30
+  live:
+    stall_timeout_seconds: 2.0
+    reconnect_delay_seconds: 2.0
+    maximum_reconnect_attempts: 0  # 0 retries forever
+    maximum_consecutive_read_failures: 30
+    reset_pipeline_after_seconds: 1.0
+
+runtime:
+  device: 0  # CUDA device index, cpu, or ONNX provider-compatible device
+  maximum_frames: null
+  log_level: INFO
+
+detector:
+  backend: pytorch  # pytorch or onnx
+  model:
+    pytorch: src/models/yolo26s.pt
+    onnx: src/models/yolo26s.onnx
+  image_size: 640  # Must be divisible by YOLO26s stride 32.
+  warmup_iterations: 3
+  confidence:
+    collection: 0.02
+    person: 0.25
+    animal: 0.10
+    vehicle: 0.25
+  nms:
+    yolo_iou_threshold: 0.70
+    maximum_detections: 300
+    vehicle_group:
+      enabled: true
+      iou_threshold: 0.50
+  classes:
+    person: [0]
+    # bird, cat, dog, horse, sheep, cow, elephant, bear, zebra, giraffe
+    animal: [14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+    # car, motorcycle, bus, truck
+    vehicle: [2, 3, 5, 7]
+
+tracker:
+  confidence:
+    high: 0.10
+    low: 0.02
+    new_track: 0.25
+  association:
+    match_threshold: 0.70
+    inertia: 0.10
+    delta_t: 3
+    use_byte_association: true
+    fuse_detection_score: false
+  # OC-SORT max_age. Converted to frames from effective tracker update FPS.
+  maximum_age_seconds: 0.5
+  emitted_prediction_frames: 1
+
+motion:
+  history:
+    maximum_observations: 10
+    minimum_observations: 5
+    moving_grace_frames: 5
+  translation:
+    moving_box_diagonals_per_second: 0.18
+    stationary_box_diagonals_per_second: 0.072
+    minimum_pixels_per_second: 8.0
+    minimum_image_diagonals_per_second: 0.0015
+  scale:
+    moving_log_height_per_second: 0.15
+    stationary_log_height_per_second: 0.06
+    minimum_direction_consistency: 0.70
+
+awareness:
+  window_frames: 15
+  person:
+    presence_detection_frames: 8
+    counting_track_frames: 8
+    counting_detector_confirmations: 4
+  animal:
+    presence_detection_frames: 8
+    counting_track_frames: 8
+    counting_detector_confirmations: 4
+  moving_vehicle:
+    track_frames: 6
+    detector_confirmations: 3
+
+output:
+  include_tracks: true
+  console: false
+  jsonl:
+    enabled: false
+    path: awareness.jsonl
+  annotated_video:
+    enabled: false
+    path: annotated.mp4
+    maximum_size: 1280
+
+hydra:
+  run:
+    dir: outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  job:
+    chdir: false

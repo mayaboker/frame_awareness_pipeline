@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.venv/
+.idea/
+outputs/
+*.jsonl
+*.mp4
+!tests/fixtures/*.mp4
+
