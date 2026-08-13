@@ -245,13 +245,11 @@ source_pixels = model_pixels / gain
 ```
 
 For 64 model pixels at `imgsz=640`: approximately 128 source pixels at 1280×720,
-192 at 1920×1080, and 384 at 3840×2160. Pixel size is not physical distance;
-distance requires camera calibration and scene geometry.
-
+192 at 1920×1080, and 384 at 3840×2160. 
 ## Vehicle motion
 
 The static-camera classifier uses detector-confirmed observations only. Across a
-robust 10-observation history it estimates:
+10-observation history it estimates:
 
 - bottom-center translation in pixels/s, image diagonals/s, and box diagonals/s;
 - approach/departure as the robust slope of `log(box height)` per second;
