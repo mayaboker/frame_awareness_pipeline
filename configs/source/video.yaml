@@ -1,0 +1,11 @@
+uri: ???  # Override with source.uri=/path/to/video.mp4
+kind: file
+target_fps: 30
+# Kept schema-compatible with the camera profile; ignored for file input.
+live:
+  stall_timeout_seconds: 2.0
+  reconnect_delay_seconds: 2.0
+  maximum_reconnect_attempts: 0
+  maximum_consecutive_read_failures: 30
+  reset_pipeline_after_seconds: 1.0
+

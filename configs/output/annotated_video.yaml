@@ -1,0 +1,9 @@
+include_tracks: true
+console: false
+jsonl:
+  enabled: true
+  path: awareness.jsonl
+annotated_video:
+  enabled: true
+  path: annotated.mp4
+  maximum_size: 1280

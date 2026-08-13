@@ -1,17 +1,28 @@
 from pathlib import Path
 
 import pytest
-from omegaconf import OmegaConf
-
-from frame_awareness.config import ConfigurationError, validate_config
+from frame_awareness.config import ConfigurationError, load_config, validate_config
 
 
 def config():
-    result = OmegaConf.load(Path(__file__).resolve().parents[1] / "configs/config.yaml")
+    result = load_config(
+        Path(__file__).resolve().parents[1] / "configs/config.yaml",
+        ["runtime.device=cpu"],
+    )
     result.detector.model.pytorch = __file__
     result.detector.model.onnx = __file__
     result.runtime.device = "cpu"
     return result
+
+
+def test_source_profiles_switch_between_camera_and_video() -> None:
+    camera = config()
+    video = load_config(
+        Path(__file__).resolve().parents[1] / "configs/config.yaml",
+        ["source=video", "source.uri=/tmp/example.mp4", "runtime.device=cpu"],
+    )
+    assert camera.source.kind == "live"
+    assert video.source.kind == "file"
 
 
 def test_valid_configuration() -> None:

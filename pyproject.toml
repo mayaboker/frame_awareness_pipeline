@@ -27,9 +27,6 @@ frame-awareness = "frame_awareness.runner:entrypoint"
 where = ["src"]
 include = ["frame_awareness*"]
 
-[tool.setuptools.data-files]
-configs = ["configs/config.yaml"]
-
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 

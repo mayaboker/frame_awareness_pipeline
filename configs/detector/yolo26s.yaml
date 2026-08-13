@@ -1,0 +1,24 @@
+backend: pytorch  # pytorch or onnx
+model:
+  pytorch: src/models/yolo26s.pt
+  onnx: src/models/yolo26s.onnx
+image_size: 640  # Must be divisible by YOLO26s stride 32.
+warmup_iterations: 3
+confidence:
+  collection: 0.02
+  person: 0.25
+  animal: 0.10
+  vehicle: 0.25
+nms:
+  yolo_iou_threshold: 0.70
+  maximum_detections: 300
+  vehicle_group:
+    enabled: true
+    iou_threshold: 0.50
+classes:
+  person: [0]
+  # bird, cat, dog, horse, sheep, cow, elephant, bear, zebra, giraffe
+  animal: [14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+  # car, motorcycle, bus, truck
+  vehicle: [2, 3, 5, 7]
+

@@ -1,0 +1,14 @@
+confidence:
+  high: 0.10
+  low: 0.02
+  new_track: 0.25
+association:
+  match_threshold: 0.70
+  inertia: 0.10
+  delta_t: 3
+  use_byte_association: true
+  fuse_detection_score: false
+# OC-SORT max_age. Converted to frames from effective tracker update FPS.
+maximum_age_seconds: 0.5
+emitted_prediction_frames: 1
+

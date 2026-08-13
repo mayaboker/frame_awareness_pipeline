@@ -1,0 +1,13 @@
+window_frames: 15
+person:
+  presence_detection_frames: 8
+  counting_track_frames: 8
+  counting_detector_confirmations: 4
+animal:
+  presence_detection_frames: 8
+  counting_track_frames: 8
+  counting_detector_confirmations: 4
+moving_vehicle:
+  track_frames: 6
+  detector_confirmations: 3
+

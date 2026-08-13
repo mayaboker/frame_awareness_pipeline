@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from hydra import compose, initialize_config_dir
 from omegaconf import DictConfig, OmegaConf
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -13,9 +14,9 @@ class ConfigurationError(ValueError):
 
 
 def load_config(path: str | Path = "configs/config.yaml", overrides: list[str] | None = None) -> DictConfig:
-    config = OmegaConf.load(path)
-    if overrides:
-        config = OmegaConf.merge(config, OmegaConf.from_dotlist(overrides))
+    path = resolve_path(path)
+    with initialize_config_dir(version_base="1.3", config_dir=str(path.parent)):
+        config = compose(config_name=path.stem, overrides=overrides or [])
     validate_config(config)
     return config
 

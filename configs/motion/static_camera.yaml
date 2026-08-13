@@ -1,0 +1,14 @@
+history:
+  maximum_observations: 10
+  minimum_observations: 5
+  moving_grace_frames: 5
+translation:
+  moving_box_diagonals_per_second: 0.18
+  stationary_box_diagonals_per_second: 0.072
+  minimum_pixels_per_second: 8.0
+  minimum_image_diagonals_per_second: 0.0015
+scale:
+  moving_log_height_per_second: 0.15
+  stationary_log_height_per_second: 0.06
+  minimum_direction_consistency: 0.70
+

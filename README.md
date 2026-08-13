@@ -54,7 +54,13 @@ instead of accumulating delay.
 ## Repository layout
 
 ```text
-configs/config.yaml               all tunable runtime settings
+configs/config.yaml               Hydra defaults and runtime settings
+configs/source/                   camera and video input profiles
+configs/detector/yolo26s.yaml     model, image size, classes, confidence, NMS
+configs/tracker/ocsort.yaml       association, confidence, and max age
+configs/motion/static_camera.yaml robust vehicle-motion thresholds
+configs/awareness/temporal.yaml   15-frame decision rules
+configs/output/                   default and annotated-video profiles
 src/frame_awareness/config.py     validation and path resolution
 src/frame_awareness/types.py      stable typed API
 src/frame_awareness/detector.py   YOLO, class pooling, vehicle NMS
@@ -87,31 +93,31 @@ additional or larger model variants are added.
 USB camera:
 
 ```bash
-python main.py source.uri=0 source.kind=live runtime.device=0
+python main.py source=camera source.uri=0 runtime.device=0
 ```
 
 RTSP:
 
 ```bash
 python main.py \
+  source=camera \
   source.uri='rtsp://user:password@camera/stream' \
-  source.kind=live runtime.device=0
+  runtime.device=0
 ```
 
 Video file:
 
 ```bash
 python main.py \
-  source.uri=/data/example.mp4 source.kind=file runtime.device=0 \
-  output.jsonl.enabled=true \
-  output.annotated_video.enabled=true
+  source=video source.uri=/data/example.mp4 runtime.device=0 \
+  output=annotated_video
 ```
 
 Hydra writes the resolved run configuration and runtime outputs under
 `outputs/YYYY-MM-DD/HH-MM-SS/`. Use an explicit directory with:
 
 ```bash
-python main.py source.uri=/data/example.mp4 source.kind=file \
+python main.py source=video source.uri=/data/example.mp4 \
   hydra.run.dir=outputs/my_run
 ```
 
@@ -132,10 +138,15 @@ that the motion classifier labels moving.
 
 ## Hydra tuning guide
 
-All production controls live in [`configs/config.yaml`](configs/config.yaml). Override
-any value from the command line without editing code:
+Production controls are separated into presentable Hydra groups. The root
+[`configs/config.yaml`](configs/config.yaml) composes `source`, `detector`, `tracker`,
+`motion`, `awareness`, and `output` profiles. Switch a profile or override any value
+without editing code:
 
 ```bash
+python main.py source=camera source.uri=0
+python main.py source=video source.uri=/data/example.mp4
+python main.py output=annotated_video
 python main.py detector.image_size=960
 python main.py tracker.maximum_age_seconds=0.75
 python main.py tracker.association.match_threshold=0.65
