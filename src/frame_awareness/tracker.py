@@ -45,7 +45,6 @@ class OCSortTracker:
             inertia=float(association.inertia),
             use_byte=bool(association.use_byte_association),
         )
-        # Construct all trackers before processing. Ultralytics shares its ID allocator.
         self.trackers = {group: OCSORT(args) for group in GROUPS}
         self.states: dict[tuple[str, int], _BridgeState] = {}
         self.id_map: dict[tuple[str, int], int] = {}
@@ -111,4 +110,3 @@ class OCSortTracker:
 
     def reset(self) -> None:
         self._make_trackers()
-

@@ -4,7 +4,6 @@ target_fps: 30
 live:
   stall_timeout_seconds: 2.0
   reconnect_delay_seconds: 2.0
-  maximum_reconnect_attempts: 0  # 0 retries forever
+  maximum_reconnect_attempts: 0
   maximum_consecutive_read_failures: 30
   reset_pipeline_after_seconds: 1.0
-

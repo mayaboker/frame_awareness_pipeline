@@ -8,7 +8,7 @@ defaults:
   - _self_
 
 runtime:
-  device: 0  # CUDA device index, cpu, or ONNX provider-compatible device
+  device: 0
   maximum_frames: null
   log_level: INFO
 

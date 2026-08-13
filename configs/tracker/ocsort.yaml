@@ -8,7 +8,5 @@ association:
   delta_t: 3
   use_byte_association: true
   fuse_detection_score: false
-# OC-SORT max_age. Converted to frames from effective tracker update FPS.
 maximum_age_seconds: 0.5
 emitted_prediction_frames: 1
-
