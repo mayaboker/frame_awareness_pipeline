@@ -1,15 +1,14 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from pathlib import Path
-from typing import Any, Iterable
+from collections.abc import Iterable
+from typing import Any
 
 import numpy as np
 from ultralytics import YOLO
 
 from .config import resolve_path
 from .types import Detection
-
 
 GROUPS = ("person", "animal", "vehicle")
 

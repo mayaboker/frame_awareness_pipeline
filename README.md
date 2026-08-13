@@ -86,13 +86,28 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 pip install --no-deps -e .
-python -c "import torch; print(torch.cuda.is_available(), torch.cuda.get_device_name(0))"
+python -c "import torch; print('CUDA:', torch.cuda.is_available()); print('Device:', torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU')"
+python main.py source=video source.uri=/path/to/video.mp4 runtime.maximum_frames=3
 ```
 
 `pyproject.toml` remains the package dependency source of truth;
-`requirements.txt` is the convenient direct-install equivalent. Install the CUDA
-build of PyTorch appropriate for the deployment machine before the requirements file
-if the default package index would otherwise select a CPU-only build.
+`requirements.txt` pins the validated direct runtime versions for reproducible
+deployments. Install the matching CUDA build of the pinned PyTorch version before the
+requirements file if the default package index would otherwise select an unsuitable
+build.
+
+The default `runtime.device=auto` selects CUDA device 0 when PyTorch can use it and
+otherwise uses CPU. Override it with `runtime.device=0` to require CUDA, or
+`runtime.device=cpu` to require CPU. A requested but unavailable CUDA device fails
+before opening the source.
+
+An editable checkout is convenient for tuning. A regular installation is supported
+as well and includes the default Hydra profiles and both model files:
+
+```bash
+pip install .
+frame-awareness source=video source.uri=/path/to/video.mp4
+```
 
 The model binaries are stored under `src/models` as requested. They are 20 MB and
 37 MB, both below GitHub's 100 MB per-file limit. Git LFS can be introduced later if
@@ -122,6 +137,8 @@ python main.py \
   source=video source.uri=/data/example.mp4 runtime.device=0 \
   output=annotated_video
 ```
+
+Omit `runtime.device` in these commands to use automatic CUDA/CPU selection.
 
 Hydra writes the resolved run configuration and runtime outputs under
 `outputs/YYYY-MM-DD/HH-MM-SS/`. Use an explicit directory with:

@@ -6,11 +6,10 @@ import hydra
 from hydra.core.hydra_config import HydraConfig
 from omegaconf import DictConfig
 
-from .config import validate_config
+from .config import resolve_config_path, validate_config
 from .runner import ApplicationRunner
 
-
-CONFIG_DIRECTORY = str(Path(__file__).resolve().parents[2] / "configs")
+CONFIG_DIRECTORY = str(resolve_config_path("configs/config.yaml").parent)
 
 
 @hydra.main(version_base="1.3", config_path=CONFIG_DIRECTORY, config_name="config")

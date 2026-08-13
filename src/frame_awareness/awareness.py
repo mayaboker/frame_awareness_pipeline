@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import math
 from collections import defaultdict, deque
+from collections.abc import Iterable, Mapping
 from dataclasses import replace
-from typing import Any, Iterable, Mapping
+from typing import Any
 
 import numpy as np
 
-from .detector import GROUPS
 from .types import AwarenessResult, Detection, Latency, MotionState, Track
 
 

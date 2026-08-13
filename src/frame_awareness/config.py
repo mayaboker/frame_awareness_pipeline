@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+import sysconfig
 from pathlib import Path
 from typing import Any
 
 from hydra import compose, initialize_config_dir
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import DictConfig
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
+INSTALLED_ROOT = Path(sysconfig.get_path("data")) / "share" / "frame_awareness"
 
 
 class ConfigurationError(ValueError):
@@ -14,7 +16,7 @@ class ConfigurationError(ValueError):
 
 
 def load_config(path: str | Path = "configs/config.yaml", overrides: list[str] | None = None) -> DictConfig:
-    path = resolve_path(path)
+    path = resolve_config_path(path)
     with initialize_config_dir(version_base="1.3", config_dir=str(path.parent)):
         config = compose(config_name=path.stem, overrides=overrides or [])
     validate_config(config)
@@ -74,18 +76,58 @@ def validate_config(config: Any) -> None:
         raise ConfigurationError("Temporal evidence requirements must be in [1, window_frames]")
     if float(config.tracker.maximum_age_seconds) <= 0:
         raise ConfigurationError("tracker.maximum_age_seconds must be positive")
-    _validate_device(config.runtime.device, backend)
+    resolve_device(config.runtime.device, backend)
 
 
 def resolve_path(value: str | Path) -> Path:
     path = Path(str(value)).expanduser()
-    return path if path.is_absolute() else PROJECT_ROOT / path
+    if path.is_absolute():
+        return path
+    checkout_path = PROJECT_ROOT / path
+    if checkout_path.exists():
+        return checkout_path
+    if path.parts[:2] == ("src", "models"):
+        return _installed_root() / "models" / Path(*path.parts[2:])
+    return checkout_path
 
 
-def _validate_device(device: Any, backend: str) -> None:
+def resolve_config_path(value: str | Path) -> Path:
+    path = Path(str(value)).expanduser()
+    if path.is_absolute():
+        return path
+    checkout_path = PROJECT_ROOT / path
+    if checkout_path.exists():
+        return checkout_path
+    if path.parts and path.parts[0] == "configs":
+        return _installed_root() / Path(*path.parts)
+    return checkout_path
+
+
+def _installed_root() -> Path:
+    relative = Path("share/frame_awareness")
+    for parent in Path(__file__).resolve().parents:
+        candidate = parent / relative
+        if candidate.is_dir():
+            return candidate
+    return INSTALLED_ROOT
+
+
+def resolve_device(device: Any, backend: str) -> str | int:
     text = str(device).lower()
+    if text == "auto":
+        if backend == "pytorch":
+            import torch
+
+            return 0 if torch.cuda.is_available() else "cpu"
+        try:
+            import onnxruntime as ort
+        except ImportError as error:
+            raise ConfigurationError(
+                "ONNX backend requires the optional dependency: pip install '.[onnx]'"
+            ) from error
+        return 0 if "CUDAExecutionProvider" in ort.get_available_providers() else "cpu"
     if text == "cpu":
-        return
+        return "cpu"
     if backend == "pytorch":
         import torch
 
@@ -102,6 +144,7 @@ def _validate_device(device: Any, backend: str) -> None:
             raise ConfigurationError(
                 f"CUDA device {index} is unavailable; detected {torch.cuda.device_count()} device(s)"
             )
+        return index
     elif backend == "onnx":
         try:
             import onnxruntime as ort
@@ -114,3 +157,5 @@ def _validate_device(device: Any, backend: str) -> None:
                 "ONNX CUDA was requested but CUDAExecutionProvider is unavailable; "
                 "use runtime.device=cpu or install compatible onnxruntime-gpu"
             )
+        return int(text)
+    raise ConfigurationError("runtime.device must be 'auto', 'cpu', or a CUDA index")

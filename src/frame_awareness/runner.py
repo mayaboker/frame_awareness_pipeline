@@ -14,8 +14,7 @@ import numpy as np
 from omegaconf import DictConfig, OmegaConf
 
 from .pipeline import FrameAwarenessPipeline
-from .types import AwarenessResult, MotionState
-
+from .types import AwarenessResult
 
 LOGGER = logging.getLogger(__name__)
 

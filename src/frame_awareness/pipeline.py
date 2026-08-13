@@ -6,6 +6,7 @@ from typing import Any
 import numpy as np
 
 from .awareness import TemporalAwareness, VehicleMotionClassifier, apply_motion
+from .config import resolve_device
 from .detector import YoloDetector
 from .tracker import OCSortTracker
 from .types import AwarenessResult, Latency
@@ -17,7 +18,10 @@ class FrameAwarenessPipeline:
     def __init__(self, config: Any, processing_fps: float | None = None) -> None:
         self.config = config
         self.processing_fps = float(processing_fps or config.source.target_fps)
-        self.detector = YoloDetector(config.detector, _device(config.runtime.device))
+        self.detector = YoloDetector(
+            config.detector,
+            resolve_device(config.runtime.device, str(config.detector.backend).lower()),
+        )
         self.tracker = OCSortTracker(config.tracker, self.processing_fps)
         self.motion = VehicleMotionClassifier(config.motion, self.processing_fps)
         thresholds = {
@@ -74,8 +78,3 @@ class FrameAwarenessPipeline:
 
 def _elapsed_ms(started: float) -> float:
     return (time.perf_counter() - started) * 1000
-
-
-def _device(value: Any) -> str | int:
-    text = str(value)
-    return int(text) if text.isdigit() else text
