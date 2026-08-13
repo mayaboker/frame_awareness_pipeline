@@ -62,6 +62,7 @@ configs/tracker/ocsort.yaml       association, confidence, and max age
 configs/motion/static_camera.yaml robust vehicle-motion thresholds
 configs/awareness/temporal.yaml   15-frame decision rules
 configs/output/                   default and annotated-video profiles
+main.py                           visible Hydra application entry point
 src/frame_awareness/config.py     validation and path resolution
 src/frame_awareness/types.py      stable typed API
 src/frame_awareness/detector.py   YOLO, class pooling, vehicle NMS
@@ -69,8 +70,10 @@ src/frame_awareness/tracker.py    OC-SORT and ID management
 src/frame_awareness/awareness.py  motion and temporal objective
 src/frame_awareness/pipeline.py   reusable single-frame engine
 src/frame_awareness/runner.py     camera/file lifecycle and optional output
+src/frame_awareness/cli.py        installed frame-awareness command wrapper
 src/models/yolo26s.pt             default PyTorch model
 src/models/yolo26s.onnx           optional ONNX model
+requirements.txt                  convenient runtime dependency list
 ```
 
 ## Installation
@@ -81,9 +84,15 @@ recommended.
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install -e .
+pip install -r requirements.txt
+pip install --no-deps -e .
 python -c "import torch; print(torch.cuda.is_available(), torch.cuda.get_device_name(0))"
 ```
+
+`pyproject.toml` remains the package dependency source of truth;
+`requirements.txt` is the convenient direct-install equivalent. Install the CUDA
+build of PyTorch appropriate for the deployment machine before the requirements file
+if the default package index would otherwise select a CPU-only build.
 
 The model binaries are stored under `src/models` as requested. They are 20 MB and
 37 MB, both below GitHub's 100 MB per-file limit. Git LFS can be introduced later if

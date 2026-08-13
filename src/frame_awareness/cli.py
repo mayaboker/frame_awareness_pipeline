@@ -6,11 +6,14 @@ import hydra
 from hydra.core.hydra_config import HydraConfig
 from omegaconf import DictConfig
 
-from frame_awareness.config import validate_config
-from frame_awareness.runner import ApplicationRunner
+from .config import validate_config
+from .runner import ApplicationRunner
 
 
-@hydra.main(version_base="1.3", config_path="configs", config_name="config")
+CONFIG_DIRECTORY = str(Path(__file__).resolve().parents[2] / "configs")
+
+
+@hydra.main(version_base="1.3", config_path=CONFIG_DIRECTORY, config_name="config")
 def main(config: DictConfig) -> None:
     validate_config(config)
     logging.getLogger().setLevel(str(config.runtime.log_level).upper())
@@ -20,5 +23,9 @@ def main(config: DictConfig) -> None:
     runner.run()
 
 
-if __name__ == "__main__":
+def entrypoint() -> None:
     main()
+
+
+if __name__ == "__main__":
+    entrypoint()

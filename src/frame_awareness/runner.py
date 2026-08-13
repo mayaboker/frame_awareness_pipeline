@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import logging
-import signal
 import statistics
 import threading
 import time
@@ -11,12 +10,9 @@ from pathlib import Path
 from typing import Any
 
 import cv2
-import hydra
 import numpy as np
-from hydra.core.hydra_config import HydraConfig
 from omegaconf import DictConfig, OmegaConf
 
-from .config import validate_config
 from .pipeline import FrameAwarenessPipeline
 from .types import AwarenessResult, MotionState
 
@@ -332,21 +328,3 @@ def _percentiles(values: list[float]) -> dict[str, float | None]:
         "p95": float(np.percentile(values, 95)) if values else None,
         "p99": float(np.percentile(values, 99)) if values else None,
     }
-
-
-CONFIG_DIRECTORY = str(Path(__file__).resolve().parents[2] / "configs")
-
-
-@hydra.main(version_base="1.3", config_path=CONFIG_DIRECTORY, config_name="config")
-def main(config: DictConfig) -> None:
-    validate_config(config)
-    logging.getLogger().setLevel(str(config.runtime.log_level).upper())
-    output_dir = Path(HydraConfig.get().runtime.output_dir)
-    runner = ApplicationRunner(config, output_dir)
-    signal.signal(signal.SIGINT, runner.stop)
-    signal.signal(signal.SIGTERM, runner.stop)
-    runner.run()
-
-
-def entrypoint() -> None:
-    main()
