@@ -10,4 +10,6 @@ animal:
 moving_vehicle:
   track_frames: 6
   detector_confirmations: 3
-
+stationary_vehicle:
+  track_frames: 6
+  detector_confirmations: 3

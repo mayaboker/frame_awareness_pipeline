@@ -6,6 +6,7 @@ motion, and a 15-frame temporal decision. It reports:
 - whether a person is present and how many stable person identities exist;
 - whether an animal is present and how many stable animal identities exist;
 - whether a **moving** vehicle is present and how many stable moving vehicles exist;
+- how many stable **stationary** vehicles exist, without making the frame relevant;
 - a combined `relevant_present` state.
 
 Cars, motorcycles, buses, and trucks are pooled into `vehicle`. A stationary vehicle
@@ -131,10 +132,12 @@ At 30 FPS, the default 15-frame window is approximately 0.5 seconds.
 | Animal present | animal detection ≥0.10 in at least 8 of 15 frames |
 | Person/animal count | stable ID in 8 frames with 4 detector confirmations |
 | Moving vehicle | stable moving ID in 6 frames with 3 confirmations ≥0.25 |
+| Stationary vehicle count | stable stationary ID in 6 frames with 3 confirmations ≥0.25 |
 
 Person and animal **presence** intentionally survives OC-SORT ID changes. Their
 counts require stable identities. Vehicle presence requires a stable vehicle track
-that the motion classifier labels moving.
+that the motion classifier labels moving. Stationary vehicles are counted for context,
+but they never activate `relevant_present` by themselves.
 
 ## Hydra tuning guide
 
@@ -271,7 +274,7 @@ Intermediate evidence remains uncertain or preserves the previous stable state.
 
 ```json
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "frame_index": 192,
   "timestamp_seconds": 6.4,
   "person_present": true,
@@ -280,6 +283,7 @@ Intermediate evidence remains uncertain or preserves the previous stable state.
   "animal_count": 0,
   "moving_vehicle_present": true,
   "moving_vehicle_count": 1,
+  "stationary_vehicle_count": 2,
   "relevant_present": true,
   "tracks": [],
   "latency": {

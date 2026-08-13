@@ -239,11 +239,12 @@ class _OutputResources:
     def emit(self, frame: np.ndarray, result: AwarenessResult) -> None:
         if bool(self.config.console):
             LOGGER.info(
-                "frame=%d person=%s animal=%s moving_vehicle=%s latency=%.1fms",
+                "frame=%d person=%s animal=%s moving_vehicle=%s stationary_vehicles=%d latency=%.1fms",
                 result.frame_index,
                 result.person_present,
                 result.animal_present,
                 result.moving_vehicle_present,
+                result.stationary_vehicle_count,
                 result.latency.total_ms,
             )
         if self.jsonl:
@@ -292,6 +293,27 @@ def _annotate(frame: np.ndarray, result: AwarenessResult) -> np.ndarray:
             cv2.FONT_HERSHEY_SIMPLEX,
             0.5,
             color,
+            1,
+            cv2.LINE_AA,
+        )
+    lines = (
+        f"person: {result.person_count}",
+        f"animal: {result.animal_count}",
+        f"moving vehicle: {result.moving_vehicle_count}",
+        f"stationary vehicle: {result.stationary_vehicle_count}",
+        f"relevant: {'YES' if result.relevant_present else 'NO'}",
+    )
+    panel_width = 270
+    left = max(0, output.shape[1] - panel_width)
+    cv2.rectangle(output, (left, 0), (output.shape[1], 126), (20, 20, 20), -1)
+    for index, line in enumerate(lines):
+        cv2.putText(
+            output,
+            line,
+            (left + 8, 22 + index * 23),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.55,
+            (255, 255, 255),
             1,
             cv2.LINE_AA,
         )

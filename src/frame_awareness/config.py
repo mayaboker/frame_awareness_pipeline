@@ -68,6 +68,7 @@ def validate_config(config: Any) -> None:
         config.awareness.animal.presence_detection_frames,
         config.awareness.animal.counting_track_frames,
         config.awareness.moving_vehicle.track_frames,
+        config.awareness.stationary_vehicle.track_frames,
     )
     if window <= 0 or any(int(value) <= 0 or int(value) > window for value in requirements):
         raise ConfigurationError("Temporal evidence requirements must be in [1, window_frames]")

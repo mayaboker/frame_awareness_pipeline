@@ -48,6 +48,7 @@ class AwarenessResult:
     animal_count: int
     moving_vehicle_present: bool
     moving_vehicle_count: int
+    stationary_vehicle_count: int
     relevant_present: bool
     tracks: tuple[Track, ...]
     latency: Latency
@@ -57,4 +58,3 @@ class AwarenessResult:
         if not include_tracks:
             result.pop("tracks")
         return result
-

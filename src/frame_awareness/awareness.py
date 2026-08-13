@@ -116,19 +116,25 @@ class TemporalAwareness:
         animal_present = self._detection_presence("animal", self.config.animal)
         person_count = self._count("person", self.config.person)
         animal_count = self._count("animal", self.config.animal)
-        vehicle_count = self._count("vehicle", self.config.moving_vehicle)
-        vehicle_present = vehicle_count > 0
+        moving_vehicle_count = self._count(
+            "vehicle", self.config.moving_vehicle, MotionState.MOVING
+        )
+        stationary_vehicle_count = self._count(
+            "vehicle", self.config.stationary_vehicle, MotionState.STATIONARY
+        )
+        moving_vehicle_present = moving_vehicle_count > 0
         return AwarenessResult(
-            "1.0",
+            "1.1",
             frame_index,
             timestamp_seconds,
             person_present,
             person_count,
             animal_present,
             animal_count,
-            vehicle_present,
-            vehicle_count,
-            person_present or animal_present or vehicle_present,
+            moving_vehicle_present,
+            moving_vehicle_count,
+            stationary_vehicle_count,
+            person_present or animal_present or moving_vehicle_present,
             tracks,
             latency,
         )
@@ -141,7 +147,12 @@ class TemporalAwareness:
             for _, detections in self.detection_frames
         ) >= required
 
-    def _count(self, group: str, rule: Any) -> int:
+    def _count(
+        self,
+        group: str,
+        rule: Any,
+        required_motion: MotionState | None = None,
+    ) -> int:
         track_frames: dict[int, set[int]] = defaultdict(set)
         confirmations: dict[int, int] = defaultdict(int)
         threshold = float(self.thresholds[group])
@@ -149,7 +160,7 @@ class TemporalAwareness:
             for track in tracks:
                 if track.group != group:
                     continue
-                if group == "vehicle" and track.motion_state != MotionState.MOVING:
+                if required_motion is not None and track.motion_state != required_motion:
                     continue
                 track_frames[track.track_id].add(frame_index)
                 confirmations[track.track_id] += int(
