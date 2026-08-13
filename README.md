@@ -346,14 +346,3 @@ and the age of the most recently processed frame.
   can make those 15 observations span more than 0.5 seconds.
 - Saved-video throughput includes decode, drawing, resizing, and software encoding and
   is not representative of the inference core.
-
-## Tests
-
-```bash
-pip install -e '.[dev]'
-pytest -q
-```
-
-Tests cover configuration invariants, class pooling, grouped NMS, temporal semantics,
-FPS-normalized motion, and OC-SORT maximum-age conversion. A deployment release should
-also run a short GPU smoke video and an RTSP reconnect test on the target camera/network.

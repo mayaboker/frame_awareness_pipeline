@@ -1,7 +1,5 @@
 .git
 .venv
 outputs
-tests
 __pycache__
 *.pyc
-

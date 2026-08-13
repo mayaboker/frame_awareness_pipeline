@@ -18,7 +18,7 @@ dependencies = [
 
 [project.optional-dependencies]
 onnx = ["onnxruntime-gpu>=1.20,<2"]
-dev = ["pytest>=8,<9", "ruff>=0.9"]
+dev = ["ruff>=0.9"]
 
 [project.scripts]
 frame-awareness = "frame_awareness.runner:entrypoint"
@@ -26,9 +26,6 @@ frame-awareness = "frame_awareness.runner:entrypoint"
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["frame_awareness*"]
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 100
