@@ -1,6 +1,6 @@
 # Frame Awareness Pipeline
 
-Production-oriented static-camera awareness using YOLO26s, OC-SORT, robust vehicle
+static-camera maintaining frame awareness using YOLO26s, OC-SORT, vehicle
 motion, and a 15-frame temporal decision. It reports:
 
 - whether a person is present and how many stable person identities exist;
